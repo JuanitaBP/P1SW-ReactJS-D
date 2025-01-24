@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Panel, useStore } from 'reactflow';
 import { InputsAtributes } from './InputsAtributes';
+import { InputMethod } from './InputMethod';  //importar metodos
 
 const selectedNodesSelector = (state) =>
   Array.from(state.nodeInternals.values())
@@ -33,15 +34,19 @@ export const MultiSelectionToolbar = ({ setNodes }) => {
   const handleChangeNodes = () => {
     setNodes(nodes => nodes.map(nd => {
       if (nd.id == selectedNodeIds) {
-        nd.data.label = titulo;
-        nd.data.atributos = [...atributos];
-        nd.data.tipos = [...tipos];
-        nd.data.primaryKey = [...primaryKey];
+        nd.data = {
+          ...nd.data,
+          label: titulo,
+          atributos: [...atributos],
+          tipos: [...tipos],
+          primaryKey: [...primaryKey],
+          methods: [...methods]
+        };
         nd.selected = false;
       }
       return nd;
-    }))
-  }
+    }));
+  };
 
   const addAtributo = () => {
     const n = atributos.length;
@@ -86,6 +91,31 @@ export const MultiSelectionToolbar = ({ setNodes }) => {
     setPrimaryKey([...array]);
     return;
   }
+
+  const [methods, setMethods] = useState([]);
+
+  useEffect(() => {
+    setMethods(selectedNode.map(node => node.data.methods || [])[0] || []);
+  }, [selectedNode]);
+
+  const handleMethodChange = (index, field, value) => {
+    const updatedMethods = [...methods];
+    updatedMethods[index][field] = value;
+    setMethods(updatedMethods);
+  };
+
+  const deleteMethod = (index) => {
+    setMethods(methods.filter((_, i) => i !== index));
+  };
+
+  const addMethod = () => {
+    setMethods([...methods, {
+      name: `method${methods.length}`,
+      params: '',
+      returnType: 'void'
+    }]);
+  };
+
   
   return (
     <>
@@ -95,20 +125,33 @@ export const MultiSelectionToolbar = ({ setNodes }) => {
             <h2>NodeID: {selectedNodeIds}</h2>
             <input type="text" name="titulo" value={titulo} onChange={onInputChange} className='px-2 bg-[#F8E6BCFF] rounded border border-gray-400' />
             <button className='bg-[#8BD3DD] rounded' onClick={addAtributo}>Agregar Atributo</button>
+
             {atributos != undefined &&
               atributos.map((atributo, index) => (
                 <InputsAtributes key={index} index={index}
-                atributo={atributo} 
-                deleteAtributo={deleteAtributo} 
-                tipos={tipos[index]} 
-                primaryKey={primaryKey[index]} 
-                changeAtributo={handleChangeAtributo} 
-                changeTipo={handleChangeTipo}
-                changePK={handleChangePK}
+                  atributo={atributo}
+                  deleteAtributo={deleteAtributo}
+                  tipos={tipos[index]}
+                  primaryKey={primaryKey[index]}
+                  changeAtributo={handleChangeAtributo}
+                  changeTipo={handleChangeTipo}
+                  changePK={handleChangePK}
+                />
+
+              ))}
+            <button className='bg-[#8BD3DD] rounded' onClick={addMethod}>Agregar Método</button>
+
+            {methods.map((method, index) => (
+              <InputMethod
+                key={index}
+                index={index}
+                method={method}
+                onChange={handleMethodChange}
+                onDelete={deleteMethod}
               />
-              ))
-            }
-            <button onClick={handleChangeNodes} className='bg-green-700 rounded h-8'>Guardar</button>            
+            ))}
+
+            <button onClick={handleChangeNodes} className='bg-green-700 rounded h-8'>Guardar</button>
           </div>
         </Panel>
       }
