@@ -12,6 +12,8 @@ export const InputsAtributes = ({ index,atributo, tipos, deleteAtributo, primary
         { value: 'long', label: 'long' },
         { value: 'short', label: 'short' },
         { value: 'String', label: 'String' },
+        { value: 'int', label: 'int' },
+        { value: 'int', label: 'DataTime' },
         { value: '<none>', label: '<none>' },
     ];
 
