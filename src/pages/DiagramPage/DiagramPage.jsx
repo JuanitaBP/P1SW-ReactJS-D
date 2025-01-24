@@ -40,7 +40,8 @@ const connectionLineStyle = { stroke: 'white' };
 
 
 let nodeId = 0;
-const backgroundColors = ['#6ede87', '#ff0072', '#6865A5'];
+const backgroundColors = ['#BB3EBBFF','#6ede87', '#ff0072', '#6865A5', '#EBC139E5'];
+
 
 export const Diagram = () => {
   const params = useParams();
